@@ -1,0 +1,14 @@
+\section*{Results}
+
+The codebase provides three levels of experiments. The \texttt{test} preset checks dimensions, numerical finiteness, RLS symmetry, and deterministic fixed-seed behavior. The \texttt{smoke} preset runs a small Figure 1A experiment and writes a trace figure and data file. The \texttt{reproduction} preset uses the larger reference scale \(N=1000\), \(p=0.1\), \(g=1.5\), \(\alpha=1\), \(\Delta t=0.1\), and \(1440\) seconds of simulated training time, matching the supplemental Matlab example.
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=0.95\linewidth]{force-traces.pdf}
+\caption{FORCE reproduction traces. The top panel shows training, the middle panel shows autonomous testing after weight updates stop, and the bottom panel shows the readout weight norm.}
+\label{fig:force-traces}
+\end{figure}
+
+The completed full reproduction produced training MAE \(=0.005416\), testing MAE \(=0.036433\), and testing correlation \(=0.997139\). The red network output closely overlaps the green target during the autonomous test phase, reproducing the qualitative behavior shown in Figure 2D of Sussillo and Abbott \cite{sussillo_generating_2009}. The full result is saved as \texttt{results/data/figure2d\_external.mat}; the report figure is stored as \texttt{report/figures/force-traces.pdf}.
+
+The parameter sweep script varies \(g\) and \(\alpha\). This is used to document tuning rather than to claim a new result. The expected pattern, consistent with the paper's discussion around Figure 5, is that strongly recurrent networks with \(g>1\) are useful for FORCE learning, while \(\alpha\) controls how aggressive the early RLS updates are.

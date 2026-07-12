@@ -1,0 +1,4 @@
+# Results and report artifacts should not be treated as text diffs.
+*.mat binary
+*.pdf binary
+*.png binary

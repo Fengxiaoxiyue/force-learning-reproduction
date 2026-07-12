@@ -1,0 +1,7 @@
+\section*{Conclusion}
+
+This project implements a reproducible MATLAB workflow for the Figure 2D FORCE learning result. The central mechanism is the RLS update that keeps the network output close to the target during training while finding a fixed readout vector that supports autonomous generation afterward.
+
+The implementation is intentionally modular: the target function, RLS rule, simulation loop, metrics, plotting, tests, and scripts are separated. This makes the reproduction easier to inspect than the original single-file examples while preserving the same mathematical structure.
+
+Future extensions include running the full Figure 1C internal-learning reproduction, adding the sparse internal-learning case, and reproducing additional targets such as the noisy four-sinusoid example, square wave, or Lorenz-like trajectory.

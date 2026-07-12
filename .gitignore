@@ -1,0 +1,30 @@
+# Original publication materials and course inputs (not redistributed).
+/Sussillo and Abbott - 2009 - Generating Coherent Patterns of Activity from Chaotic Neural Networks.pdf
+/ScienceDirect_files_22Apr2026_15-15-07.313/
+/Command of reproduction/
+
+# MATLAB editor, autosave, profiler, and crash artifacts.
+*.asv
+*.m~
+*.mexw64
+slprj/
+simulink/
+matlab_crash_dump.*
+
+# LaTeX build products. Curated report PDFs are explicitly retained.
+report/*.aux
+report/*.bbl
+report/*.bcf
+report/*.blg
+report/*.fdb_latexmk
+report/*.fls
+report/*.log
+report/*.out
+report/*.run.xml
+report/*.synctex.gz
+report/*.toc
+
+# Operating-system and editor noise.
+.DS_Store
+Thumbs.db
+.vscode/

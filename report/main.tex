@@ -1,0 +1,29 @@
+% Based on article class
+\documentclass[a4paper,12pt]{article}
+
+% Load all packages and settings in the preamble 
+\input{settings/packages}
+% Load initial settings for the document
+\input{settings/initial}	
+    
+\begin{document}
+
+    % The main text part
+	\input{sections/Firstpage}          
+	\input{sections/Background}
+    \input{sections/Methods}
+    \input{sections/Results}
+    \input{sections/Conclusion}
+
+
+	% Bibliography
+    \clearpage
+    \fancyhead[L]{}
+    \fancyhead[R]{}
+	\input{sections/References}
+
+    \newpage 
+    
+    \input{sections/ReadingNotes_TN}
+    
+\end{document}

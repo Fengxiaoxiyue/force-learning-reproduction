@@ -1,0 +1,7 @@
+\section*{Background and Introduction}
+
+Recurrent neural networks can produce rich spontaneous dynamics because activity is continuously fed back through recurrent synapses. When the recurrent gain is large, random rate networks can become chaotic \cite{sompolinsky_chaos_1988}. This creates a useful reservoir of temporal activity, but it also makes direct control difficult.
+
+Sussillo and Abbott \cite{sussillo_generating_2009} proposed FORCE learning as a way to turn chaotic spontaneous activity into coherent target patterns. The algorithm rapidly suppresses output error during learning and then leaves a stable set of weights that can autonomously regenerate the desired signal. The paper demonstrates many outputs, including periodic signals, noisy targets, discontinuous functions, Lorenz-like trajectories, and movement patterns.
+
+This reproduction focuses on the most direct starting point: Figure 2D, a periodic function composed of four sinusoids, trained in the Figure 1A external-feedback architecture. This choice is appropriate for a first reproduction because the paper's supplemental Matlab code contains a compact reference implementation, and the target is simple enough to inspect while still exercising the core FORCE/RLS mechanism.

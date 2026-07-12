@@ -1,0 +1,84 @@
+% *** LANGUAGE PACKAGES ***
+\usepackage[english]{babel} 
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}		% Great font
+\renewcommand*\familydefault{\sfdefault}
+\usepackage[useregional]{datetime2}		% To use several date formats
+
+% *** GEOMETRY PACKAGES ***
+\usepackage{geometry}
+\geometry{left=10mm,
+	right=10mm,
+	top=25mm,
+	bottom=20mm,
+	headheight = 25 mm
+} 
+\usepackage{lastpage}
+
+% *** COLOR PACKAGES ***
+\usepackage[table]{xcolor}		% "table" for table rowcolors
+% Color definitiions
+\definecolor{blue}{RGB}{0,89,140}
+\definecolor{gray}{RGB}{242,242,242}
+\definecolor{grayblack}{RGB}{50,50,50}
+\definecolor{blue2}{RGB}{10,62,157}
+\definecolor{red2}{RGB}{173,17,0}
+\definecolor{gray2}{RGB}{230,230,230}
+
+% *** HEADING AND FOOTER ***
+\usepackage{fancyhdr} % For heading and footers
+\renewcommand{\headrulewidth}{0.5pt}
+\let\oldheadrule\headrule% Copy \headrule into \oldheadrule
+\renewcommand{\headrule}{\color{blue}\oldheadrule}% Add colour to \headrule
+\renewcommand{\footrulewidth}{0.5pt} 
+\let\oldfootrule\footrule%
+\renewcommand{\footrule}{\color{blue}\oldfootrule}% Add colour to \headrule
+\pagestyle{fancy}                    % Default page style
+\cfoot{}                             % Empty foot center  
+
+\rfoot{\textcolor{grayblack}{\small Page \thepage\ / \pageref*{LastPage}}} 			     % Total of pages
+
+% *** GRAPHICS RELATED PACKAGES ***
+\usepackage{graphicx}       % Loading images
+\usepackage{float}          % Figures inside minipages
+\usepackage{wrapfig}		% Text wrapped around figure
+\usepackage{tikz}			% Used to load cover figure
+\usepackage[hypcap,font={color=grayblack}]{caption} % used to style the captions
+\usepackage{subcaption} 	% For subfigures
+\usepackage{overpic}		% To add text over figures
+\graphicspath{{figures/}}  % Figures relative directory
+
+% *** TITLE PACKAGES ***
+\usepackage{titlesec}
+\titleformat{\section}{\color{blue}\normalfont\Large\bfseries}{\thesection}{1em}{} % set the fonts of the (sub)session titles
+\titleformat{\subsection}{\color{blue}\normalfont\large\bfseries}{\thesubsection}{1em}{}
+\usepackage{setspace} 
+
+% *** TABLE PACKAGES ***
+\usepackage{booktabs}
+\usepackage{colortbl}
+\usepackage{footnote} % To have footnotes inside tables
+\usepackage{array}
+
+% Links and urls
+\usepackage{xurl} 
+\urlstyle{sf} 
+\usepackage[colorlinks,
+citecolor=cyan,
+urlcolor=blue,
+linkcolor=blue,
+citebordercolor={0 0 1},
+urlbordercolor={0 1 1},
+linktocpage,
+hyperfootnotes=true
+]{hyperref}
+
+%%% EQUATIONS %%%
+\usepackage{mathtools}
+
+%%% TABLE %%%
+\usepackage{tabularray}     
+
+%%% Reference and citation %%%
+% Keep references simple so the report can compile without biber.
