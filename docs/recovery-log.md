@@ -199,3 +199,27 @@ Sweeping delay and gain found no stable target orbit; stronger nonlinear gain
 was actively harmful. Increasing to `N=1500` halved online error without
 stabilizing the frozen loop. The remaining failure is a delayed closed-loop
 stability/parameter-basin issue rather than a history-reset artifact.
+
+### Figure 7B: five static-input-selected patterns
+
+| N | Modified rows | Epochs | Mean MAE | Mean corr. | Worst MAE | Runtime |
+|---:|---:|---:|---:|---:|---:|---:|
+| 300 | 200 | 10 | 0.401 | 0.418 | 0.538 | 9.9 s |
+| 600 | 400 | 10 | 0.290 | 0.760 | 0.447 | 56.8 s |
+| 1200 | 800 | 5 | 0.256 | 0.767 | 0.379 | 132.7 s |
+| 1200 | 800 | 10 | 0.075 | 0.974 | 0.166 | 252.9 s |
+
+**Outcome: strongly recovered as a structural/shared-P reproduction.** The
+baseline implementation incorrectly assigned one disjoint recurrent row group
+to each pattern and copied a readout update only into that group. The revised
+protocol uses the published `N=1200`, `p=0.8`, `alpha=80`, 100-dimensional
+random static inputs, strong initialization patterns, weak control patterns,
+and 800 fixed modified neurons shared by all five tasks. Scaling gives a clear
+monotonic improvement, and all five outputs at 10 epochs have the correct
+shape; five-epoch early stopping is worse despite lower instantaneous update
+history. The exact paper algorithm keeps a separate sparse RLS matrix for each
+modified row (roughly 6 GB for these parameters). This run uses the shared-P
+low-rank approximation already used by the project's Figure 1C implementation,
+and the three-sinusoid coefficients are structural because their numerical
+values were not published. It therefore supports the multifunction mechanism
+but is not an exact numerical duplication of Figure 7B.

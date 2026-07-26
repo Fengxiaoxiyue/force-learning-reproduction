@@ -77,6 +77,23 @@ assert(numel(feedback_result.output_inputs) == max(4, round(feedback_cfg.pz * fe
 assert(feedback_result.initial_feedback_weight_norm > 0, ...
     'Feedback-network trainable connections should be randomly initialized.');
 
+multifunction_cfg = make_config('test');
+multifunction_cfg.N = 60;
+multifunction_cfg.p = 0.8;
+multifunction_cfg.pattern_count = 2;
+multifunction_cfg.input_count = 10;
+multifunction_cfg.epochs = 1;
+multifunction_cfg.pattern_duration = 6;
+multifunction_cfg.initialization_duration = 1;
+multifunction_cfg.modified_count = 40;
+multifunction = run_figure7_multifunction(multifunction_cfg);
+assert(isequal(size(multifunction.outputs), [2, 60]), ...
+    'Multifunction output dimensions are incorrect.');
+assert(all(isfinite(multifunction.outputs), 'all'), ...
+    'Multifunction output contains non-finite values.');
+assert(numel(multifunction.modified_rows) == 40, ...
+    'Multifunction modified-neuron count is incorrect.');
+
 pca_cfg = make_figure2_case('D', 'standard');
 pca_cfg.N = 30;
 pca_cfg.nsecs = 6;
