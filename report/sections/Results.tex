@@ -1,7 +1,7 @@
 \section{Results}
 
-\subsection{Case-by-case audit}
-Table~\ref{tab:audit} reports the stored outputs without seed selection. ``Success'' means that the scaled implementation supports the displayed claim; ``partial'' means that training or qualitative structure is present but autonomous accuracy is weaker; ``scaled failure'' means that the available smaller network did not stabilize. Figure 2K is an intended failure case in the paper, so reproducing uncontrolled low-amplitude output is the expected result.
+\subsection{Initial case-by-case audit}
+Table~\ref{tab:audit} reports the initial scaled outputs before the high-cost recovery pass. ``Success'' means that the scaled implementation supports the displayed claim; ``partial'' means that training or qualitative structure is present but autonomous accuracy is weaker; ``scaled failure'' means that the available smaller network did not stabilize. Figure 2K is an intended failure case in the paper, so reproducing uncontrolled low-amplitude output is the expected result.
 
 {\small
 \setlength{\tabcolsep}{4pt}
@@ -42,6 +42,44 @@ Fig. S2 & 1A & maximum spectral shift 0.984 ($g=.8$), 0.408 ($g=1.5$) & Qualitat
 \end{longtable}
 }
 
+\subsection{High-cost recovery pass}
+Table~\ref{tab:recovery} reports every initially weak case after scaling, implementation audit, and expanded diagnostics. Failed parameter attempts are retained in \texttt{results/recovery}; the table is not a best-seed-only selection.
+
+{\small
+\setlength{\tabcolsep}{4pt}
+\begin{longtable}{@{}p{0.11\linewidth}p{0.12\linewidth}p{0.31\linewidth}p{0.34\linewidth}@{}}
+\caption{High-cost recovery outcomes.\label{tab:recovery}}\\
+\toprule
+Case & Outcome & Best evidence & Main cause or limitation \\
+\midrule
+\endfirsthead
+\toprule
+Case & Outcome & Best evidence & Main cause or limitation \\
+\midrule
+\endhead
+Fig. 2A--C & Recovered & $N=1500$: MAE 0.00260, corr. 0.99998 & $N=1000$ learned the orbit but drifted in phase; added capacity locked it \\
+Fig. 2E & Failed & $N=2000$: MAE 0.379; late aligned corr. 0.781 & Closed-loop drift; original 16 coefficients are unpublished \\
+Fig. 2F & Waveform recovered & aligned corr. 0.998; amplitude ratio 0.996 & Denoising succeeds; global phase remains offset \\
+Fig. 2H & Statistical success & PSD corr. 0.973; SD ratio 0.983 & Chaotic phase divergence makes long pointwise correlation inappropriate \\
+Fig. 2I fast & Recovered & $g=1.2$: MAE 0.0644, corr. 0.992 & Lower gain prevents fast-orbit amplitude decay \\
+Fig. 2I slow & Failed & $N=1500$: amplitude ratio 0.957, frequency $1.333\times$ & Frozen loop selects the wrong long-period branch \\
+Fig. 2J & Structural success & $N=500$: MAE 0.00089, corr. 0.999996 & Fixed one-step mismatch between RLS error and recurrent regressor \\
+Fig. 6A & Failed & $N=1500$: train MAE 0.0466, test MAE 0.949 & Delay buffer fixed; delayed nonlinear loop still selects a wrong frequency \\
+Fig. 6B & Failed & $N=1500$: train MAE 0.0210, test MAE 0.829 & Paper uses $N=20000$ and 500 inputs per feedback neuron \\
+Fig. 7B & Strong structural success & $N=1200$: mean MAE 0.0747, corr. 0.9735 & Corrected input/row protocol; shared-$P$ approximation remains \\
+Fig. S1 & Failed after freeze & best baseline test MAE 0.061; high-$N$ tests $>0.11$ & Scalar-rule solutions remain basin/seed sensitive; exact target unpublished \\
+\bottomrule
+\end{longtable}
+}
+
+\begin{figure}[!htbp]
+\centering
+\begin{subfigure}[t]{0.49\linewidth}\includegraphics[width=\linewidth]{recovery_figure2_abc_N1500_g_1p50_a_1p00_seed_2398_traces.pdf}\caption{Recovered triangle sequence}\end{subfigure}
+\begin{subfigure}[t]{0.49\linewidth}\includegraphics[width=\linewidth]{recovery_figure7b_N1200_alpha80_epochs10_sharedP.pdf}\caption{Five control-selected patterns}\end{subfigure}
+\caption{Representative high-cost recoveries. Full successful and failed traces are retained under \texttt{results/recovery/figures}.}
+\label{fig:recovery}
+\end{figure}
+
 \subsection{Output generation and architecture benchmark}
 Figure~\ref{fig:arch-benchmark} compares the exact four-sine target across the three architectures. Figure 1A gives the strongest autonomous result. Figure 1C also stabilizes the target. The scaled Figure 1B implementation does not: the paper used a generator with 20,000 units, so reducing it to 500 units changes both representational capacity and feedback-network statistics. This negative result is not evidence against Figure 1B at the published scale.
 
@@ -54,7 +92,7 @@ Figure~\ref{fig:arch-benchmark} compares the exact four-sine target across the t
 \label{fig:arch-benchmark}
 \end{figure}
 
-The square wave is the strongest structural reconstruction (correlation 0.966). The unpublished 16-component target and the very slow sine do not stabilize at $N=300$. The Lorenz readout fits during training, but pointwise long-horizon error grows because nearby chaotic trajectories separate; distributional or short-horizon metrics would be more appropriate than a single long correlation. All individual Figure 2 traces are retained in \texttt{results/figures}.
+The square wave remains a strong structural reconstruction (correlation 0.966). The recovery pass additionally stabilizes the triangle and fast sine, while the unpublished 16-component target and the very slow sine still fail. Lorenz evaluation now includes short-horizon correlation, marginal quantiles, power spectra, and autocorrelation rather than treating long pointwise divergence as failure. All baseline and recovery traces are retained.
 
 \subsection{Dynamical diagnostics}
 The Figure 3 analysis stores network rates and readout history, computes an SVD of centered rates, and reconstructs the output from the leading eight components. The leading components recover the output while the eigenvalue spectrum retains a long tail, matching the paper's qualitative account (main paper Figure 3).
@@ -77,7 +115,7 @@ The Figure 4 interpolation uses $\gamma z_{\mathrm{target}}+(1-\gamma)z$ during 
 \end{figure}
 
 \subsection{Feedback, control, memory, and motion}
-Of the Figure 6 variants, internal learning is robust at $N=750$ (test MAE 0.00550), whereas delayed nonlinear feedback and the separately scaled feedback network fail. Figure 7B likewise needs the paper's larger, pattern-partitioned network to reach low error; at $N=300$ its mean MAE is 0.519. Figure 7D is much more robust: four maintained signs are read correctly on 98.74\% of test samples after ON/OFF pulses.
+Of the Figure 6 variants, internal learning is robust at $N=750$ (test MAE 0.00550), whereas delayed nonlinear feedback and the separately scaled feedback network remain unstable after high-cost recovery. Figure 7B improves from the initial mean MAE 0.519 to 0.0747 at the published $N=1200$ scale after correcting the input and modified-row protocol. Figure 7D remains robust: four maintained signs are read correctly on 98.74\% of test samples after ON/OFF pulses.
 
 \begin{figure}[!htbp]
 \centering
@@ -107,7 +145,7 @@ The motion-capture experiment uses the paper's named CMU trials and a scaled Fig
 
 \clearpage
 \subsection{Supplementary analyses}
-Supplementary Figure S1 replaces RLS by $w(t)=w(t-\Delta t)-\eta(t)e^-(t)r(t)$ and $\dot\eta=\eta[-\eta+|e|^{3/2}]$ in normalized units. The full reported duration of $60{,}000\tau$ is used, but at $N=300$ the output follows only while learning remains active; frozen weights drift. Supplementary Figure S2 is reproduced more convincingly: at $g=0.8$ a few effective eigenvalues move far from the pre-training disk, whereas at $g=1.5$ the two spectra mostly overlap.
+Supplementary Figure S1 replaces RLS by $w(t)=w(t-\Delta t)-\eta(t)e^-(t)r(t)$ and $\dot\eta=\eta[-\eta+|e|^{3/2}]$ in normalized units. The full reported duration of $60{,}000\tau$ is used at $N=300$, 500, and 1000. All outputs follow while learning remains active, but frozen weights drift across three seeds; the allowed $\gamma=2$ reduces the final learning rate without stabilizing the orbit. Supplementary Figure S2 is reproduced more convincingly: at $g=0.8$ a few effective eigenvalues move far from the pre-training disk, whereas at $g=1.5$ the two spectra mostly overlap.
 
 \begin{figure}[!htbp]
 \centering

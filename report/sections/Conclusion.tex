@@ -1,15 +1,15 @@
 \section{Conclusion and Improvements}
 
-This reproduction supports the central claim that RLS can rapidly turn chaotic recurrent activity into coherent closed-loop output. The strongest evidence is the exact Figure 2D Figure 1A run (test correlation 0.996), the Figure 1C internal-learning run, the gain-dependent reduction in error and weight norm, the 98.74\% four-bit memory accuracy, and the motion-channel correlations above 0.92. The effective-spectrum analysis also recovers the paper's qualitative distinction between low and high recurrent gain.
+This reproduction supports the central claim that RLS can rapidly turn chaotic recurrent activity into coherent closed-loop output. The strongest evidence is the exact Figure 2D Figure 1A run (test correlation 0.996), the recovered triangle and fast-timescale outputs, the corrected one-shot result (correlation 0.999996), Figure 1C internal learning, the $N=1200$ multifunction result, the 98.74\% four-bit memory accuracy, and motion-channel correlations above 0.92. Chaos-aware statistics also support autonomous Lorenz-like output without requiring impossible long-horizon phase locking.
 
-The project also identifies a clear computational boundary. Cases that were published with very large generator or feedback networks do not necessarily survive reductions to a few hundred units. Figure 1B four-sine learning, delayed nonlinear feedback, the five-function internal task, the slow sine, and non-RLS autonomous output remain incomplete at the tested scales. These failures are useful results because they separate an algorithmic implementation from a claim of numerical replication.
+The recovery pass separates implementation defects from genuine stability limits. Correcting an RLS timing mismatch recovers Figure 2J, and correcting the Figure 7B control/row protocol plus using the paper scale produces a strong result. In contrast, Figure 2E, the slow sine, delayed nonlinear feedback, the separate feedback network, and non-RLS frozen output remain incomplete after larger networks and targeted sweeps. Low online error in these failures shows that fitting is not sufficient: the frozen closed loop must also land on the intended attractor.
 
 The next improvements should be made in this order:
 \begin{enumerate}
-    \item Run Figure 6B, Figure 7B, Figure 8, and S1 at the paper's network sizes on a machine with sufficient RAM, recording wall time and peak memory.
+    \item Run Figure 6B at the published $N=20000$ scale and Figure 7B with the exact per-row sparse RLS matrices on a high-memory machine.
     \item Replace reconstructed Figure 2E/2J waveforms if original numerical target files become available; retain checksums with the data.
-    \item Evaluate Lorenz output with short-horizon error, attractor occupancy, power spectra, and Lyapunov-sensitive statistics instead of only long pointwise MAE.
-    \item Add parameter recovery sweeps around $\alpha$, training duration, and feedback sparsity for failed cases, with paired seeds and confidence intervals.
+    \item Search delayed-loop and very-slow-output stability basins with paired seeds, feedback scale, and continuation in delay or target period.
+    \item Obtain the exact Figure 2E, Figure 2J, Figure 7B, and S1 numerical targets before making pointwise replication claims for structural cases.
     \item Render the 95-channel Figure 8 result through the CMU skeleton hierarchy so motion quality can be judged geometrically, not only channel-wise.
     \item Store environment metadata (MATLAB release, BLAS, CPU, RAM, TeX Live version) automatically with each full run.
 \end{enumerate}

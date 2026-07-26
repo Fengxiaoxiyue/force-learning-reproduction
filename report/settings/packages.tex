@@ -34,6 +34,8 @@
 \let\oldfootrule\footrule%
 \renewcommand{\footrule}{\color{blue}\oldfootrule}% Add colour to \headrule
 \pagestyle{fancy}                    % Default page style
+\fancyhead[L]{\small\nouppercase{\rightmark}}
+\fancyhead[R]{}
 \cfoot{}                             % Empty foot center  
 
 \rfoot{\textcolor{grayblack}{\small Page \thepage\ / \pageref*{LastPage}}} 			     % Total of pages
@@ -43,7 +45,7 @@
 \usepackage{float}          % Figures inside minipages
 \usepackage[hypcap,font={color=grayblack}]{caption} % used to style the captions
 \usepackage{subcaption} 	% For subfigures
-\graphicspath{{figures/}{../results/figures/}}
+\graphicspath{{figures/}{../results/figures/}{../results/recovery/figures/}}
 
 % *** TITLE PACKAGES ***
 \usepackage{titlesec}
