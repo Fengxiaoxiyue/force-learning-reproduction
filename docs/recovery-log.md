@@ -156,3 +156,25 @@ phase earlier. This non-monotonic short-horizon behavior is expected for a
 single deterministic seed near a chaotic trajectory and is not evidence that
 the larger network lost the attractor. Long-horizon pointwise MAE remains in
 the artifact for transparency but is not the reproduction success criterion.
+
+### Figure 1B / Figure 6B: separate feedback network
+
+| N | Inputs / feedback unit | Readout inputs | Train MAE | Test MAE | Early/late aligned corr. | Frequency ratio |
+|---:|---:|---:|---:|---:|---:|---:|
+| 1000 | 25 | 25 | 0.487 | 0.667 | 0.604 / 0.362 | 0.833 |
+| 1000 | 25 | 1000 | 0.047 | 1.007 | 0.505 / 0.568 | 0.917 |
+| 1000 | 100 | 1000 | 0.032 | 0.952 | 0.461 / 0.376 | 0.750 |
+| 1500 | 100 | 1500 | 0.021 | 0.829 | 0.388 / 0.470 | 2.250 |
+
+**Outcome: not recovered at the feasible scale.** The implementation audit
+corrected two deviations from the published Figure 6B setup: trainable `JFG`
+connections now start with random nonzero weights, and readout sparsity `pz`
+is implemented explicitly. At `N=1000`, the paper's `pz=pFG=0.025` leaves
+only 25 samples per readout/feedback unit and cannot fit online. A dense
+readout restores low training error, and increasing feedback sampling to 100
+inputs improves it further, but no frozen trajectory has the target waveform.
+The `N=1500` run also selects the wrong frequency. The paper used `N=20000`,
+95 feedback neurons, and 500 generator inputs per feedback neuron; the present
+largest run has 13 times fewer generator neurons and one fifth as many samples
+per feedback unit. The remaining failure is consistent with the random-sampling
+capacity argument given for Figure 6B, not a scalar-error or phase-offset bug.

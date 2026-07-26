@@ -8,7 +8,8 @@ if ~isfield(cfg, 'gFF'), cfg.gFF = 1.2; end
 if ~isfield(cfg, 'pGF'), cfg.pGF = 0.25; end
 if ~isfield(cfg, 'pFG'), cfg.pFG = min(0.25, max(0.05, 50 / cfg.N)); end
 if ~isfield(cfg, 'pFF'), cfg.pFF = 0.25; end
-if ~isfield(cfg, 'feedback_initial_scale'), cfg.feedback_initial_scale = 0.0; end
+if ~isfield(cfg, 'pz'), cfg.pz = 1.0; end
+if ~isfield(cfg, 'feedback_initial_scale'), cfg.feedback_initial_scale = 1.0; end
 
 rng(cfg.seed, 'twister');
 N = cfg.N;
@@ -26,8 +27,11 @@ for a = 1:NF
     Jfg(a, idx) = cfg.feedback_initial_scale * cfg.gFG * randn(1, input_count) / sqrt(input_count);
     Pfb{a} = eye(input_count) / cfg.alpha;
 end
+initial_feedback_weight_norm = norm(Jfg, 'fro');
+output_count = max(4, round(cfg.pz * N));
+output_inputs = randperm(N, output_count);
 wo = zeros(N, 1);
-P = eye(N) / cfg.alpha;
+P = eye(output_count) / cfg.alpha;
 x = 0.5 * randn(N, 1);
 y = 0.5 * randn(NF, 1);
 r = tanh(x);
@@ -43,10 +47,12 @@ for ti = 1:steps
     y = (1 - cfg.dt) * y + cfg.dt * (Mff * s + Jfg * r);
     r = tanh(x);
     s = tanh(y);
-    z = wo' * r;
+    z = wo(output_inputs)' * r(output_inputs);
     if mod(ti, cfg.learn_every) == 0
         e = z - cfg.target_train(ti);
-        [wo, P] = rls_update(wo, P, r, e);
+        output_weights = wo(output_inputs);
+        [output_weights, P] = rls_update(output_weights, P, r(output_inputs), e);
+        wo(output_inputs) = output_weights;
         for a = 1:NF
             idx = feedback_inputs{a};
             weights = Jfg(a, idx)';
@@ -62,12 +68,15 @@ for ti = 1:steps
     y = (1 - cfg.dt) * y + cfg.dt * (Mff * s + Jfg * r);
     r = tanh(x);
     s = tanh(y);
-    zpt(ti) = wo' * r;
+    zpt(ti) = wo(output_inputs)' * r(output_inputs);
 end
 
 result = struct('cfg', cfg, 'simtime', cfg.simtime, 'simtime2', cfg.simtime2, ...
     'ft', cfg.target_train, 'ft2', cfg.target_test, 'zt', zt, 'zpt', zpt, ...
-    'wo', wo, 'wo_len', wo_len, 'elapsed_seconds', toc);
+    'wo', wo, 'wo_len', wo_len, 'elapsed_seconds', toc, ...
+    'output_inputs', output_inputs, 'feedback_inputs', {feedback_inputs}, ...
+    'Jfg', Jfg, 'initial_feedback_weight_norm', initial_feedback_weight_norm, ...
+    'final_feedback_weight_norm', norm(Jfg, 'fro'));
 result.metrics = compute_metrics(result);
 if cfg.saveResults
     save(fullfile(cfg.dataDir, [cfg.tag, '.mat']), 'result', '-v7.3');

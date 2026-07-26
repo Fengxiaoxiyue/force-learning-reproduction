@@ -56,10 +56,16 @@ assert(all(isfinite(one_shot.trial_mae)), ...
 
 feedback_cfg = make_config('test');
 feedback_cfg.NF = 6;
+feedback_cfg.pz = 0.25;
+feedback_cfg.feedback_initial_scale = 1;
 feedback_cfg.target_train = make_four_sine_target(feedback_cfg.simtime, feedback_cfg);
 feedback_cfg.target_test = make_four_sine_target(feedback_cfg.simtime2, feedback_cfg);
 feedback_result = run_force_feedback_network(feedback_cfg);
 assert(all(isfinite(feedback_result.zpt)), 'Feedback-network output contains non-finite values.');
+assert(numel(feedback_result.output_inputs) == max(4, round(feedback_cfg.pz * feedback_cfg.N)), ...
+    'Feedback-network readout sparsity was not applied.');
+assert(feedback_result.initial_feedback_weight_norm > 0, ...
+    'Feedback-network trainable connections should be randomly initialized.');
 
 pca_cfg = make_figure2_case('D', 'standard');
 pca_cfg.N = 30;
