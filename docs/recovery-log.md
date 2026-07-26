@@ -86,3 +86,38 @@ but left the lag drift near 1040 samples. Increasing `N` to 2000 degraded the
 orbit, showing that capacity alone is not monotonic for a fixed random draw.
 The training MAE near 0.41 is expected because it is measured against the
 noisy target and is therefore not evidence of failed denoising.
+
+### Figure 2I: fast and slow timescales
+
+Fast target (period 6 network time constants):
+
+| N | g | alpha | Duration | Test MAE | Test corr. | Frequency ratio |
+|---:|---:|---:|---:|---:|---:|---:|
+| 1000 | 1.5 | 1 | 120 | 0.222 | 0.941 | 1.000 |
+| 1500 | 1.5 | 1 | 120 | 0.556 | 0.417 | 0.950 |
+| 1500 | 1.5 | 10 | 240 | 0.546 | 0.428 | 0.975 |
+| 1000 | 1.2 | 1 | 240 | 0.064 | 0.992 | 1.000 |
+| 1000 | 1.0 | 1 | 240 | 0.231 | 0.917 | 1.000 |
+
+**Fast outcome: recovered.** Lowering `g` from 1.5 to 1.2 and training for
+40 cycles preserved unit amplitude and the correct frequency throughout the
+autonomous test. Larger `N` did not help. The limiting factor was excessive
+chaotic gain relative to the six-time-constant oscillation, not capacity.
+
+Slow target (period 800 network time constants):
+
+| N | alpha | Training cycles | Train MAE | Test MAE | Frequency ratio | Runtime |
+|---:|---:|---:|---:|---:|---:|---:|
+| 1000 | 1 | 6 | 0.0209 | 1.550 | 0.167 | 66.4 s |
+| 1000 | 10 | 6 | 0.0353 | 1.262 | 0.167 | 69.3 s |
+| 1500 | 1 | 6 | 0.0154 | 0.777 | 1.333 | 166.6 s |
+| 2000 | 1 | 6 | 0.0016 | 0.851 | 2.333 | 304.6 s |
+
+**Slow outcome: not recovered.** Increasing the baseline from two to six
+training cycles and scaling to `N=2000` drove online error as low as 0.0016,
+but the frozen loop selected the wrong autonomous frequency. `N=1500` was the
+best compromise, restoring amplitude ratio to 0.957, yet oscillating 1.333
+times too fast. The non-monotonic frequency changes with `N` indicate a
+closed-loop bifurcation/stability problem. More samples alone are unlikely to
+fix it; recovery would require a targeted search over gain, feedback scale,
+seed, or an explicit slow-state regularizer.
