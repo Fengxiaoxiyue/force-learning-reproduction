@@ -1,0 +1,5 @@
+case_id,metric_name,metric_value,interpretation
+S1,training_tail_mae,0.00604605064851344,training-following
+S1,testing_mae,0.061236373098335,scaled-failure
+S2-g0.8,max_spectral_shift,0.984484801095301,large-outlier-shift
+S2-g1.5,max_spectral_shift,0.408328630829939,distributed-small-shift

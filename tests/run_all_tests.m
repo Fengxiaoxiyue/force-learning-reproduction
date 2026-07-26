@@ -66,4 +66,11 @@ assert(size(pca_result.rates, 1) == pca_cfg.N, 'Stored rate history has wrong si
 [motion_test, motion_labels] = read_amc_motion(fullfile(projectRoot, 'data', 'raw', 'mocap', '09_02.amc'));
 assert(~isempty(motion_test) && size(motion_test, 2) == numel(motion_labels), 'AMC parser failed.');
 
+s1_cfg = make_config('test');
+s1_cfg.nsecs = 1;
+s1_cfg.test_nsecs = 1;
+s1_result = run_supplement_s1_nonrls(s1_cfg);
+assert(isfinite(s1_result.metrics.eta_final) && s1_result.metrics.eta_final > 0, ...
+    'Non-RLS adaptive learning rate became invalid.');
+
 fprintf('All tests passed.\n');
