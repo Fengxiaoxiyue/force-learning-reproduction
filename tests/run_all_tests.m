@@ -117,6 +117,9 @@ s1_cfg.test_nsecs = 1;
 s1_result = run_supplement_s1_nonrls(s1_cfg);
 assert(isfinite(s1_result.metrics.eta_final) && s1_result.metrics.eta_final > 0, ...
     'Non-RLS adaptive learning rate became invalid.');
+assert(issparse(s1_result.M), 'Non-RLS recurrent matrix should remain sparse.');
+assert(isfinite(s1_result.metrics.frequency_ratio), ...
+    'Non-RLS periodic diagnostics are not finite.');
 
 metric_cfg = make_config('test');
 metric_result = struct('cfg', metric_cfg, 'ft', sin(0:0.1:6-0.1), ...

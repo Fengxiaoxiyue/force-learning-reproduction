@@ -223,3 +223,26 @@ low-rank approximation already used by the project's Figure 1C implementation,
 and the three-sinusoid coefficients are structural because their numerical
 values were not published. It therefore supports the multifunction mechanism
 but is not an exact numerical duplication of Figure 7B.
+
+### Supplement S1: scalar-rate non-RLS FORCE
+
+| N | Seed | gamma | Tail MAE | Test MAE | Aligned corr. | Amp. ratio | Freq. ratio | Final eta |
+|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 300 | 2101 | 1.5 | 0.0060 | 0.061 | 0.884 | 0.645 | 1.30 | 8.08e-4 |
+| 500 | 2101 | 1.5 | 0.0085 | 0.140 | 0.182 | 1.894 | 1.00 | 8.72e-4 |
+| 1000 | 2101 | 1.5 | 0.0070 | 0.133 | 0.659 | 1.968 | 1.20 | 5.87e-4 |
+| 1000 | 2101 | 2.0 | 0.0107 | 0.110 | 0.862 | 1.732 | 1.20 | 1.93e-4 |
+| 1000 | 2102 | 1.5 | 0.0063 | 0.122 | 0.518 | 1.723 | 0.30 | 5.89e-4 |
+| 1000 | 2103 | 1.5 | 0.0070 | 0.122 | 0.508 | 1.917 | 1.60 | 6.64e-4 |
+
+**Outcome: not recovered after freezing.** Every 600,000-step run follows the
+target while scalar learning remains active, but the static-weight test leaves
+the target orbit. Increasing `N` is non-monotonic. The supplemental-supported
+choice `gamma=2` reduces the final learning rate toward the paper's reported
+`3.3e-5`, yet does not stabilize amplitude or frequency. Two additional seeds
+select different wrong frequencies, demonstrating basin sensitivity rather
+than inadequate training duration. The recurrence is now kept sparse, making
+the paper-length high-N runs practical without changing dynamics. Finally, the
+supplement does not publish the exact periodic waveform; the local amplitude
+0.1 sine remains a structural target and may differ in difficulty from the
+paper example.

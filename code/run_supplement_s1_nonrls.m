@@ -11,7 +11,8 @@ if ~exist(cfg.figureDir, 'dir'), mkdir(cfg.figureDir); end
 
 rng(cfg.seed, 'twister');
 N = cfg.N;
-M = full(sprandn(N, N, cfg.p)) * cfg.g / sqrt(cfg.p * N);
+M = sprandn(N, N, cfg.p) * cfg.g / sqrt(cfg.p * N);
+if ~cfg.use_sparse_recurrent, M = full(M); end
 wf = cfg.feedback_scale * (rand(N, 1) - 0.5);
 w = zeros(N, 1);
 x = 0.5 * randn(N, 1);
@@ -61,6 +62,15 @@ metrics = struct( ...
     'eta_initial', cfg.eta_initial, ...
     'eta_final', eta, ...
     'elapsed_seconds', elapsed_seconds);
+periodic_result = struct('cfg', cfg, 'ft', target_train, 'ft2', target_test, ...
+    'zt', output_train, 'zpt', output_test, 'wo_len', ones(size(output_train)), ...
+    'elapsed_seconds', elapsed_seconds);
+recovery_metrics = compute_recovery_metrics(periodic_result, round(60 / cfg.dt));
+metrics.testing_corr = recovery_metrics.testing_corr;
+metrics.phase_aligned_corr = recovery_metrics.phase_aligned_corr;
+metrics.late_phase_aligned_corr = recovery_metrics.late_phase_aligned_corr;
+metrics.amplitude_ratio = recovery_metrics.amplitude_ratio;
+metrics.frequency_ratio = recovery_metrics.frequency_ratio;
 result = struct('cfg', cfg, 't_train', t_train, 't_test', t_test, ...
     'target_train', target_train, 'target_test', target_test, ...
     'output_train', output_train, 'output_test', output_test, ...
@@ -68,7 +78,7 @@ result = struct('cfg', cfg, 't_train', t_train, 't_test', t_test, ...
     'w', w, 'M', M, 'wf', wf, 'metrics', metrics);
 
 if cfg.saveResults
-    save(fullfile(cfg.dataDir, 'supplement_s1_nonrls.mat'), 'result', '-v7.3');
+    save(fullfile(cfg.dataDir, [cfg.tag, '.mat']), 'result', '-v7.3');
 end
 if cfg.makePlots
     save_plot(result);
@@ -77,7 +87,8 @@ end
 
 function cfg = apply_defaults(cfg)
 defaults = struct('eta_initial', 2e-3, 'eta_exponent', 1.5, ...
-    'target_amplitude', 0.1, 'test_nsecs', 600);
+    'target_amplitude', 0.1, 'test_nsecs', 600, ...
+    'use_sparse_recurrent', true, 'tag', 'supplement_s1_nonrls');
 names = fieldnames(defaults);
 for i = 1:numel(names)
     if ~isfield(cfg, names{i}), cfg.(names{i}) = defaults.(names{i}); end
@@ -107,7 +118,7 @@ plot_idx = 1:plot_stride:numel(result.t_train);
 semilogy(result.t_train(plot_idx), result.eta_history(plot_idx), ...
     'k', 'LineWidth', 1.1); grid on;
 title('B: adaptive scalar learning rate'); xlabel('time / tau'); ylabel('eta');
-exportgraphics(fig, fullfile(cfg.figureDir, 'supplement_s1_nonrls.png'), 'Resolution', 200);
-exportgraphics(fig, fullfile(cfg.figureDir, 'supplement_s1_nonrls.pdf'), 'ContentType', 'vector');
+exportgraphics(fig, fullfile(cfg.figureDir, [cfg.tag, '.png']), 'Resolution', 200);
+exportgraphics(fig, fullfile(cfg.figureDir, [cfg.tag, '.pdf']), 'ContentType', 'vector');
 close(fig);
 end
