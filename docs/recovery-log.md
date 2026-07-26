@@ -46,3 +46,22 @@ but its absolute phase drifted. Increasing the network to `N=1500` removed
 the phase error without changing the seed, gain, regularization, target, or
 training duration. The failure was therefore capacity/closed-loop phase
 stability, not an incorrect target or RLS implementation.
+
+### Figure 2E: 16-component structural target
+
+| N | g | alpha | Test MAE | Early aligned corr. | Late aligned corr. | Runtime |
+|---:|---:|---:|---:|---:|---:|---:|
+| 1000 | 1.5 | 1 | 0.547 | 0.552 | 0.896 | 20.0 s |
+| 1500 | 1.5 | 1 | 0.483 | 0.707 | 0.539 | 52.0 s |
+| 1500 | 1.8 | 1 | 0.630 | 0.308 | 0.585 | 50.6 s |
+| 1500 | 1.5 | 10 | 0.445 | 0.997 | 0.706 | 51.4 s |
+| 2000 | 1.5 | 10 | 0.379 | 0.970 | 0.781 | 91.5 s |
+
+**Outcome: not recovered.** Stronger regularization produced a very accurate
+first test cycle, but the frozen trajectory drifted and later cycles degraded.
+Increasing `N` to 2000 improved exact MAE only modestly; increasing `g` to 1.8
+made the result worse. Low training error together with poor late-cycle error
+identifies closed-loop trajectory instability rather than an RLS convergence
+failure. The original 16 coefficients were not published, so this deterministic
+high-harmonic reconstruction may also be harder or spectrally different from
+the paper target. This result cannot test exact numerical replication of 2E.

@@ -21,6 +21,9 @@ testing_mae = zeros(row_count, 1);
 testing_corr = zeros(row_count, 1);
 phase_aligned_mae = zeros(row_count, 1);
 phase_aligned_corr = zeros(row_count, 1);
+late_phase_aligned_mae = zeros(row_count, 1);
+late_phase_aligned_corr = zeros(row_count, 1);
+phase_lag_drift_steps = zeros(row_count, 1);
 amplitude_ratio = zeros(row_count, 1);
 frequency_ratio = zeros(row_count, 1);
 elapsed_seconds = zeros(row_count, 1);
@@ -54,16 +57,32 @@ for ai = 1:row_count
     testing_corr(ai) = recovery_metrics.testing_corr;
     phase_aligned_mae(ai) = recovery_metrics.phase_aligned_mae;
     phase_aligned_corr(ai) = recovery_metrics.phase_aligned_corr;
+    late_phase_aligned_mae(ai) = recovery_metrics.late_phase_aligned_mae;
+    late_phase_aligned_corr(ai) = recovery_metrics.late_phase_aligned_corr;
+    phase_lag_drift_steps(ai) = recovery_metrics.phase_lag_drift_steps;
     amplitude_ratio(ai) = recovery_metrics.amplitude_ratio;
     frequency_ratio(ai) = recovery_metrics.frequency_ratio;
     elapsed_seconds(ai) = recovery_metrics.elapsed_seconds;
 end
 
-summary = table(attempt_id, network_size, g, alpha, seed, training_mae, ...
+new_summary = table(attempt_id, network_size, g, alpha, seed, training_mae, ...
     testing_mae, testing_corr, phase_aligned_mae, phase_aligned_corr, ...
+    late_phase_aligned_mae, late_phase_aligned_corr, phase_lag_drift_steps, ...
     amplitude_ratio, frequency_ratio, elapsed_seconds);
 csv_name = sprintf('recovery_figure2_%s_summary.csv', lower(case_id));
-writetable(summary, fullfile(data_dir, csv_name));
+csv_path = fullfile(data_dir, csv_name);
+if exist(csv_path, 'file')
+    summary = readtable(csv_path, 'TextType', 'string');
+    missing = setdiff(new_summary.Properties.VariableNames, summary.Properties.VariableNames);
+    if ~isempty(missing)
+        summary = refresh_external_recovery_summary(case_id);
+    end
+    summary(ismember(summary.attempt_id, new_summary.attempt_id), :) = [];
+    summary = [summary; new_summary];
+else
+    summary = new_summary;
+end
+writetable(summary, csv_path);
 disp(summary);
 end
 
