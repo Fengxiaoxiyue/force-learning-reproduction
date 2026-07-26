@@ -32,6 +32,16 @@ assert(all(isfinite(r1.zt)) && all(isfinite(r1.zpt)), 'Simulation output contain
 assert(isfinite(r1.metrics.training_mae), 'Training MAE is not finite.');
 assert(isfinite(r1.metrics.testing_mae), 'Testing MAE is not finite.');
 
+delayed_cfg = make_config('test');
+delayed_cfg.feedback_mode = 'delayed_nonlinear';
+delayed_cfg.feedback_delay_steps = 2;
+delayed_cfg.target_train = make_four_sine_target(delayed_cfg.simtime, delayed_cfg);
+delayed_cfg.target_test = make_four_sine_target(delayed_cfg.simtime2, delayed_cfg);
+delayed_result = run_force_external(delayed_cfg);
+assert(isequal(delayed_result.test_history_prefix, ...
+    delayed_result.zt(end - delayed_cfg.feedback_delay_steps + 1:end)), ...
+    'Delayed test feedback did not inherit the training history.');
+
 [case_cfg, case_info] = make_figure2_case('H', 'standard');
 assert(numel(case_cfg.target_train) == case_cfg.num_steps, 'Figure 2 target length mismatch.');
 assert(all(isfinite(case_cfg.target_train)), 'Figure 2 target contains non-finite values.');

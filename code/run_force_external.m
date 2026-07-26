@@ -103,12 +103,25 @@ if cfg.verbose
     fprintf('Training MAE: %.6f\n', training_mae);
 end
 
+test_history = zpt;
+test_history_offset = 0;
+test_history_prefix = [];
+if strcmpi(cfg.feedback_mode, 'delayed_nonlinear')
+    delay_steps = cfg.feedback_delay_steps;
+    assert(delay_steps <= simtime_len, 'Feedback delay exceeds training duration.');
+    history_prefix = z_history(end - delay_steps + 1:end);
+    test_history_prefix = history_prefix;
+    test_history = [history_prefix, zeros(1, simtime_len)];
+    test_history_offset = delay_steps;
+end
 for ti = 1:simtime_len
-    feedback_value = testing_feedback(z, zpt, ti, cfg);
+    history_index = test_history_offset + ti;
+    feedback_value = testing_feedback(z, test_history, history_index, cfg);
     x = (1.0 - cfg.dt) * x + M * (r * cfg.dt) + wf * (feedback_value * cfg.dt);
     r = tanh(x);
     z = wo' * r;
     zpt(ti) = z;
+    test_history(history_index) = z;
 end
 
 elapsed_seconds = toc;
@@ -129,6 +142,7 @@ result.wo_history = wo_history;
 result.history_time = simtime(1:cfg.history_stride:end);
 result.M = M;
 result.wf = wf;
+result.test_history_prefix = test_history_prefix;
 result.elapsed_seconds = elapsed_seconds;
 result.metrics = compute_metrics(result);
 

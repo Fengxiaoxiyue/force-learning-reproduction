@@ -178,3 +178,24 @@ The `N=1500` run also selects the wrong frequency. The paper used `N=20000`,
 largest run has 13 times fewer generator neurons and one fifth as many samples
 per feedback unit. The remaining failure is consistent with the random-sampling
 capacity argument given for Figure 6B, not a scalar-error or phase-offset bug.
+
+### Figure 6A: delayed nonlinear feedback
+
+| N | Delay | Gain | Train MAE | Test MAE | Early/late aligned corr. | Frequency ratio |
+|---:|---:|---:|---:|---:|---:|---:|
+| 1000 | 50 ms | 1.3 | 0.096 | 1.181 | 0.407 / 0.506 | 0.833 |
+| 1000 | 100 ms | 1.0 | 0.061 | 0.956 | 0.458 / 0.332 | 0.750 |
+| 1000 | 100 ms | 1.3 | 0.093 | 1.388 | 0.442 / 0.518 | 0.500 |
+| 1000 | 100 ms | 1.6 | 0.157 | 1.847 | 0.578 / 0.516 | 0.167 |
+| 1000 | 150 ms | 1.3 | 0.082 | 1.006 | 0.261 / 0.556 | 0.583 |
+| 1500 | 100 ms | 1.3 | 0.047 | 0.949 | 0.649 / 0.383 | 0.333 |
+
+**Outcome: not recovered.** The test path previously cleared its delay buffer
+at the training/test boundary. It now carries the final 100 ms of training
+output into testing, matching a continuous delayed system, and a regression
+test protects that behavior. Nevertheless, the published point
+`1.3*tanh(sin(pi*z(t-100 ms)))` selects a wrong-frequency autonomous orbit.
+Sweeping delay and gain found no stable target orbit; stronger nonlinear gain
+was actively harmful. Increasing to `N=1500` halved online error without
+stabilizing the frozen loop. The remaining failure is a delayed closed-loop
+stability/parameter-basin issue rather than a history-reset artifact.
