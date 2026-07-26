@@ -65,3 +65,24 @@ identifies closed-loop trajectory instability rather than an RLS convergence
 failure. The original 16 coefficients were not published, so this deterministic
 high-harmonic reconstruction may also be harder or spectrally different from
 the paper target. This result cannot test exact numerical replication of 2E.
+
+### Figure 2F: learning a noisy target
+
+| N | alpha | Duration | Test MAE | Early aligned MAE | Late aligned MAE | Runtime |
+|---:|---:|---:|---:|---:|---:|---:|
+| 1000 | 1 | 1440 | 0.419 | 0.0669 | 0.0579 | 21.2 s |
+| 1500 | 1 | 1440 | 0.964 | 0.0899 | 0.0998 | 52.0 s |
+| 1500 | 10 | 1440 | 0.318 | 0.0586 | 0.0674 | 52.0 s |
+| 2000 | 10 | 1440 | 0.785 | 0.3548 | 0.4829 | 91.7 s |
+| 1500 | 10 | 2880 | 0.326 | 0.0425 | 0.0422 | 101.7 s |
+
+**Outcome: waveform and denoising recovered; absolute phase only partial.**
+The `N=1500`, `alpha=10`, double-duration run generated a clean autonomous
+four-sine waveform despite training against additive Gaussian noise. Its early
+and late one-cycle correlations were 0.9974 and 0.9980, amplitude ratio was
+0.996, and frequency ratio was 1.000. The remaining exact MAE comes from a
+nearly constant/global phase offset: doubling training reduced aligned error
+but left the lag drift near 1040 samples. Increasing `N` to 2000 degraded the
+orbit, showing that capacity alone is not monotonic for a fixed random draw.
+The training MAE near 0.41 is expected because it is measured against the
+noisy target and is therefore not evidence of failed denoising.

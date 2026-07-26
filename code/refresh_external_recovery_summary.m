@@ -16,6 +16,7 @@ for i = 1:numel(files)
     save(fullfile(files(i).folder, files(i).name), 'result', '-v7.3');
     records(i).attempt_id = string(erase(files(i).name, '.mat'));
     records(i).network_size = result.cfg.N;
+    records(i).training_duration = result.cfg.nsecs;
     records(i).g = result.cfg.g;
     records(i).alpha = result.cfg.alpha;
     records(i).seed = result.cfg.seed;

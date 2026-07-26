@@ -1,0 +1,16 @@
+%RECOVER_FIGURE2_F High-cost noisy-target and denoising attempts.
+
+projectRoot = fileparts(fileparts(fileparts(mfilename('fullpath'))));
+addpath(fullfile(projectRoot, 'code'));
+
+specs(1) = struct('N', 1000, 'seed_offset', 0, 'g', 1.5, 'alpha', 1.0, ...
+    'duration_scale', 1.0);
+specs(2) = struct('N', 1500, 'seed_offset', 0, 'g', 1.5, 'alpha', 1.0, ...
+    'duration_scale', 1.0);
+specs(3) = struct('N', 1500, 'seed_offset', 0, 'g', 1.5, 'alpha', 10.0, ...
+    'duration_scale', 1.0);
+specs(4) = struct('N', 2000, 'seed_offset', 0, 'g', 1.5, 'alpha', 10.0, ...
+    'duration_scale', 1.0);
+specs(5) = struct('N', 1500, 'seed_offset', 0, 'g', 1.5, 'alpha', 10.0, ...
+    'duration_scale', 2.0);
+summary = run_external_recovery('F', specs); %#ok<NASGU>
