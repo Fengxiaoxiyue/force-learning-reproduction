@@ -63,4 +63,7 @@ pca_cfg.store_rates = true;
 pca_result = run_force_external(pca_cfg);
 assert(size(pca_result.rates, 1) == pca_cfg.N, 'Stored rate history has wrong size.');
 
+[motion_test, motion_labels] = read_amc_motion(fullfile(projectRoot, 'data', 'raw', 'mocap', '09_02.amc'));
+assert(~isempty(motion_test) && size(motion_test, 2) == numel(motion_labels), 'AMC parser failed.');
+
 fprintf('All tests passed.\n');

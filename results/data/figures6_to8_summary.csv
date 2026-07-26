@@ -1,0 +1,8 @@
+case_id,architecture,metric_name,metric_value
+6A,1A-delayed,testing_mae,1.44260056901552
+6B,1B,testing_mae,0.947704823504384
+6C,1C,testing_mae,0.00549565365780046
+7B,1C,mean_mae,0.519329578342213
+7D,1C,bit_accuracy,0.987395833333333
+8-run,1B,correlation,0.920239503827305
+8-walk,1B,correlation,0.967601342767331
