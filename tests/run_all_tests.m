@@ -49,4 +49,18 @@ feedback_cfg.target_test = make_four_sine_target(feedback_cfg.simtime2, feedback
 feedback_result = run_force_feedback_network(feedback_cfg);
 assert(all(isfinite(feedback_result.zpt)), 'Feedback-network output contains non-finite values.');
 
+pca_cfg = make_figure2_case('D', 'standard');
+pca_cfg.N = 30;
+pca_cfg.nsecs = 6;
+pca_cfg.simtime = 0:pca_cfg.dt:(pca_cfg.nsecs - pca_cfg.dt);
+pca_cfg.simtime2 = pca_cfg.nsecs:pca_cfg.dt:(2 * pca_cfg.nsecs - pca_cfg.dt);
+pca_cfg.num_steps = numel(pca_cfg.simtime);
+pca_cfg.target_train = make_four_sine_target(pca_cfg.simtime, pca_cfg);
+pca_cfg.target_test = make_four_sine_target(pca_cfg.simtime2, pca_cfg);
+pca_cfg.makePlots = false;
+pca_cfg.saveResults = false;
+pca_cfg.store_rates = true;
+pca_result = run_force_external(pca_cfg);
+assert(size(pca_result.rates, 1) == pca_cfg.N, 'Stored rate history has wrong size.');
+
 fprintf('All tests passed.\n');
