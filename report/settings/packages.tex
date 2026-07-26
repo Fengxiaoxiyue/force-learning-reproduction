@@ -4,14 +4,13 @@
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}		% Great font
 \renewcommand*\familydefault{\sfdefault}
-\usepackage[useregional]{datetime2}		% To use several date formats
 
 % *** GEOMETRY PACKAGES ***
 \usepackage{geometry}
-\geometry{left=10mm,
-	right=10mm,
+\geometry{left=18mm,
+	right=18mm,
 	top=25mm,
-	bottom=20mm,
+	bottom=25mm,
 	headheight = 25 mm
 } 
 \usepackage{lastpage}
@@ -42,12 +41,9 @@
 % *** GRAPHICS RELATED PACKAGES ***
 \usepackage{graphicx}       % Loading images
 \usepackage{float}          % Figures inside minipages
-\usepackage{wrapfig}		% Text wrapped around figure
-\usepackage{tikz}			% Used to load cover figure
 \usepackage[hypcap,font={color=grayblack}]{caption} % used to style the captions
 \usepackage{subcaption} 	% For subfigures
-\usepackage{overpic}		% To add text over figures
-\graphicspath{{figures/}}  % Figures relative directory
+\graphicspath{{figures/}{../results/figures/}}
 
 % *** TITLE PACKAGES ***
 \usepackage{titlesec}
@@ -60,9 +56,12 @@
 \usepackage{colortbl}
 \usepackage{footnote} % To have footnotes inside tables
 \usepackage{array}
+\usepackage{tabularx}
+\usepackage{longtable}
+\usepackage{microtype}
 
 % Links and urls
-\usepackage{xurl} 
+\usepackage{url}
 \urlstyle{sf} 
 \usepackage[colorlinks,
 citecolor=cyan,
@@ -76,9 +75,6 @@ hyperfootnotes=true
 
 %%% EQUATIONS %%%
 \usepackage{mathtools}
-
-%%% TABLE %%%
-\usepackage{tabularray}     
 
 %%% Reference and citation %%%
 % Keep references simple so the report can compile without biber.

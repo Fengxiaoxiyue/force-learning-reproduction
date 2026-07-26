@@ -1,14 +1,118 @@
-\section*{Results}
+\section{Results}
 
-The codebase provides three levels of experiments. The \texttt{test} preset checks dimensions, numerical finiteness, RLS symmetry, and deterministic fixed-seed behavior. The \texttt{smoke} preset runs a small Figure 1A experiment and writes a trace figure and data file. The \texttt{reproduction} preset uses the larger reference scale \(N=1000\), \(p=0.1\), \(g=1.5\), \(\alpha=1\), \(\Delta t=0.1\), and \(1440\) seconds of simulated training time, matching the supplemental Matlab example.
+\subsection{Case-by-case audit}
+Table~\ref{tab:audit} reports the stored outputs without seed selection. ``Success'' means that the scaled implementation supports the displayed claim; ``partial'' means that training or qualitative structure is present but autonomous accuracy is weaker; ``scaled failure'' means that the available smaller network did not stabilize. Figure 2K is an intended failure case in the paper, so reproducing uncontrolled low-amplitude output is the expected result.
+
+{\small
+\setlength{\tabcolsep}{4pt}
+\begin{longtable}{@{}p{0.10\linewidth}p{0.08\linewidth}p{0.39\linewidth}p{0.29\linewidth}@{}}
+\caption{Audit of main-text and supplementary cases.\label{tab:audit}}\\
+\toprule
+Case & Arch. & Stored quantitative evidence & Assessment \\
+\midrule
+\endfirsthead
+\toprule
+Case & Arch. & Stored quantitative evidence & Assessment \\
+\midrule
+\endhead
+Fig. 2A--C & 1A & test MAE 0.289; correlation 0.833 & Partial triangle-sequence reconstruction \\
+Fig. 2D & 1A & train MAE 0.00282; test MAE 0.0403; correlation 0.996 & Success; exact published target \\
+Fig. 2D & 1B & test MAE 1.073; correlation $-0.100$ & Scaled failure ($N=500$, $N_F=95$) \\
+Fig. 2D & 1C & test MAE 0.0729; correlation 0.926 & Success at internal-learning scale \\
+Fig. 2E & 1A & test MAE 0.547; correlation 0.045 & Scaled failure; unpublished 16 coefficients \\
+Fig. 2F & 1A & noisy-target test MAE 0.419; correlation 0.612 & Partial noise-filtering behavior \\
+Fig. 2G & 1A & test MAE 0.0447; correlation 0.966 & Success; structural square wave \\
+Fig. 2H & 1A & train MAE 0.0277; long test MAE 0.881 & Training fit; chaotic trajectories diverge \\
+Fig. 2I fast & 1A & test MAE 0.222; correlation 0.941 & Partial 60-ms-period reconstruction \\
+Fig. 2I slow & 1A & test MAE 2.139; correlation 0.055 & Scaled failure for 8-s period \\
+Fig. 2J & 1A, two loops & test MAE 0.160; correlation 0.827 & Partial one-shot structural reconstruction \\
+Fig. 2K & 1A & correlation 0.027 at amplitude 0.05 & Expected chaos-control failure reproduced \\
+Fig. 3 & 1A & eight-PC output reconstruction and long-tail spectrum & Qualitative PCA reproduction \\
+Fig. 4 & 1A & stable trials fall from 80\% at $\gamma=0$ to 0\% for $\gamma\ge0.2$ & Feedback-mismatch trend reproduced \\
+Fig. 5 & 1A & RMSE falls to 0.078 and $\|w\|_2$ to 0.355 at $g=1.55$ & Gain dependence reproduced \\
+Fig. 6A & 1A & test MAE 1.443 & Scaled delayed-feedback failure \\
+Fig. 6B & 1B & test MAE 0.948 & Scaled separate-network failure \\
+Fig. 6C & 1C & test MAE 0.00550 & Success \\
+Fig. 7B & 1C & mean five-pattern MAE 0.519 & Scaled multifunction failure \\
+Fig. 7D & 1C & four-bit sign accuracy 98.74\% & Success \\
+Fig. 8 & 1B & run/walk correlations 0.920/0.968 & Success on 95 motion channels \\
+Fig. S1 & 1A & train-tail MAE 0.00605; frozen test MAE 0.0612 & Training follows; scaled autonomous failure \\
+Fig. S2 & 1A & maximum spectral shift 0.984 ($g=.8$), 0.408 ($g=1.5$) & Qualitative spectral contrast reproduced \\
+\bottomrule
+\end{longtable}
+}
+
+\subsection{Output generation and architecture benchmark}
+Figure~\ref{fig:arch-benchmark} compares the exact four-sine target across the three architectures. Figure 1A gives the strongest autonomous result. Figure 1C also stabilizes the target. The scaled Figure 1B implementation does not: the paper used a generator with 20,000 units, so reducing it to 500 units changes both representational capacity and feedback-network statistics. This negative result is not evidence against Figure 1B at the published scale.
 
 \begin{figure}[!htbp]
 \centering
-\includegraphics[width=0.95\linewidth]{force-traces.pdf}
-\caption{FORCE reproduction traces. The top panel shows training, the middle panel shows autonomous testing after weight updates stop, and the bottom panel shows the readout weight norm.}
-\label{fig:force-traces}
+\begin{subfigure}[t]{0.32\linewidth}\includegraphics[width=\linewidth]{figure2_d_traces.pdf}\caption{Figure 1A}\end{subfigure}
+\begin{subfigure}[t]{0.32\linewidth}\includegraphics[width=\linewidth]{figure2_d_architecture_1b_traces.pdf}\caption{Figure 1B, scaled}\end{subfigure}
+\begin{subfigure}[t]{0.32\linewidth}\includegraphics[width=\linewidth]{figure2_d_architecture_1c_traces.pdf}\caption{Figure 1C}\end{subfigure}
+\caption{Figure 2D target under the three Figure 1 architectures. Source: main paper pp. 3--6 and publisher MATLAB examples.}
+\label{fig:arch-benchmark}
 \end{figure}
 
-The completed full reproduction produced training MAE \(=0.005416\), testing MAE \(=0.036433\), and testing correlation \(=0.997139\). The red network output closely overlaps the green target during the autonomous test phase, reproducing the qualitative behavior shown in Figure 2D of Sussillo and Abbott \cite{sussillo_generating_2009}. The full result is saved as \texttt{results/data/figure2d\_external.mat}; the report figure is stored as \texttt{report/figures/force-traces.pdf}.
+The square wave is the strongest structural reconstruction (correlation 0.966). The unpublished 16-component target and the very slow sine do not stabilize at $N=300$. The Lorenz readout fits during training, but pointwise long-horizon error grows because nearby chaotic trajectories separate; distributional or short-horizon metrics would be more appropriate than a single long correlation. All individual Figure 2 traces are retained in \texttt{results/figures}.
 
-The parameter sweep script varies \(g\) and \(\alpha\). This is used to document tuning rather than to claim a new result. The expected pattern, consistent with the paper's discussion around Figure 5, is that strongly recurrent networks with \(g>1\) are useful for FORCE learning, while \(\alpha\) controls how aggressive the early RLS updates are.
+\subsection{Dynamical diagnostics}
+The Figure 3 analysis stores network rates and readout history, computes an SVD of centered rates, and reconstructs the output from the leading eight components. The leading components recover the output while the eigenvalue spectrum retains a long tail, matching the paper's qualitative account (main paper Figure 3).
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=0.96\linewidth]{figure3_pca.pdf}
+\caption{PCA diagnostics for the four-sine task. Source: main paper Figure 3, approximately pp. 6--7.}
+\label{fig:pca}
+\end{figure}
+
+The Figure 4 interpolation uses $\gamma z_{\mathrm{target}}+(1-\gamma)z$ during training, but always closes the loop with $z$ during testing. As the train/test feedback mismatch increases, stability falls. In the paired-seed sweep, 80\% of trials pass the fixed stability criterion at $\gamma=0$, compared with none for $\gamma\ge0.2$. Figure 5 shows the complementary gain effect: low-$g$ networks require large weights and do not meet the cycle-MAE threshold, while $g\ge1.25$ reaches it in one cycle; test RMSE falls sharply at the largest gains tested.
+
+\begin{figure}[!htbp]
+\centering
+\begin{subfigure}[t]{0.49\linewidth}\includegraphics[width=\linewidth]{figure4_feedback_sweep.pdf}\caption{Feedback mixture}\end{subfigure}
+\begin{subfigure}[t]{0.49\linewidth}\includegraphics[width=\linewidth]{figure5_gain_sweep.pdf}\caption{Recurrent gain}\end{subfigure}
+\caption{Figures 4 and 5 scaled diagnostics. Each parameter comparison uses paired random seeds. Source: main paper Figures 4--5.}
+\label{fig:sweeps}
+\end{figure}
+
+\subsection{Feedback, control, memory, and motion}
+Of the Figure 6 variants, internal learning is robust at $N=750$ (test MAE 0.00550), whereas delayed nonlinear feedback and the separately scaled feedback network fail. Figure 7B likewise needs the paper's larger, pattern-partitioned network to reach low error; at $N=300$ its mean MAE is 0.519. Figure 7D is much more robust: four maintained signs are read correctly on 98.74\% of test samples after ON/OFF pulses.
+
+\begin{figure}[!htbp]
+\centering
+\begin{subfigure}[t]{0.32\linewidth}\includegraphics[width=\linewidth]{figure6a_delayed_nonlinear_traces.pdf}\caption{6A: delayed nonlinear}\end{subfigure}
+\begin{subfigure}[t]{0.32\linewidth}\includegraphics[width=\linewidth]{figure6b_feedback_network_traces.pdf}\caption{6B: separate feedback}\end{subfigure}
+\begin{subfigure}[t]{0.32\linewidth}\includegraphics[width=\linewidth]{figure6c_internal_traces.pdf}\caption{6C: internal learning}\end{subfigure}
+\caption{Figure 6 variants. Source: main paper Figure 6, approximately pp. 9--10.}
+\label{fig:figure6}
+\end{figure}
+
+\begin{figure}[!htbp]
+\centering
+\begin{subfigure}[t]{0.49\linewidth}\includegraphics[width=\linewidth]{figure7_multifunction.pdf}\caption{Five control-selected outputs}\end{subfigure}
+\begin{subfigure}[t]{0.49\linewidth}\includegraphics[width=\linewidth]{figure7_memory.pdf}\caption{Four-bit memory}\end{subfigure}
+\caption{Figure 7 internal-learning tasks. Panels 7A and 7C define the control protocols represented in these simulations; panels 7B and 7D show the outputs.}
+\label{fig:figure7}
+\end{figure}
+
+The motion-capture experiment uses the paper's named CMU trials and a scaled Figure 1B network with 95 outputs. Correlations of 0.920 (running) and 0.968 (walking) show that the first eight plotted channels and the aggregate 95-channel trajectories are tracked well, although this is a channel-level reconstruction rather than a rendered skeleton animation.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.93\linewidth]{figure8_mocap.pdf}
+\caption{Running and walking targets (solid) and outputs (dashed), first 8 of 95 channels. Source: main paper Figure 8 and CMU trials 09\_02/08\_01.}
+\label{fig:mocap}
+\end{figure}
+
+\clearpage
+\subsection{Supplementary analyses}
+Supplementary Figure S1 replaces RLS by $w(t)=w(t-\Delta t)-\eta(t)e^-(t)r(t)$ and $\dot\eta=\eta[-\eta+|e|^{3/2}]$ in normalized units. The full reported duration of $60{,}000\tau$ is used, but at $N=300$ the output follows only while learning remains active; frozen weights drift. Supplementary Figure S2 is reproduced more convincingly: at $g=0.8$ a few effective eigenvalues move far from the pre-training disk, whereas at $g=1.5$ the two spectra mostly overlap.
+
+\begin{figure}[!htbp]
+\centering
+\begin{subfigure}[t]{0.49\linewidth}\includegraphics[width=\linewidth]{supplement_s1_nonrls.pdf}\caption{S1: scalar learning rate}\end{subfigure}
+\begin{subfigure}[t]{0.49\linewidth}\includegraphics[width=\linewidth]{supplement_s2_eigenvalues.pdf}\caption{S2: effective spectra}\end{subfigure}
+\caption{Supplementary cases. Green crosses in S2 mark the four target angular frequencies and the vertical line marks $\operatorname{Re}(\lambda)=1$.}
+\label{fig:supplement}
+\end{figure}

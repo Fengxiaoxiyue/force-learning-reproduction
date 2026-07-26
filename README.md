@@ -1,55 +1,74 @@
 # FORCE Learning Reproduction
 
-This repository reproduces a compact part of Sussillo and Abbott (2009), focusing on Figure 2D with the Figure 1A external feedback architecture. It also includes a small Figure 1C all-to-all internal-learning extension.
+Independent MATLAB reproduction of the displayed computational cases in Sussillo and Abbott (2009), *Generating Coherent Patterns of Activity from Chaotic Neural Networks*.
 
-## Project layout
+## Scope
 
-- `code/`: reusable MATLAB functions for the model, target function, RLS update, metrics, and plotting.
-- `scripts/`: runnable experiment scripts.
-- `tests/`: lightweight MATLAB tests.
-- `results/data/`: generated `.mat` and `.csv` outputs.
-- `results/figures/`: generated plots.
-- `docs/workflow.md`: step-by-step reproduction notes in Chinese.
-- `report/`: LaTeX project report.
-- `SOURCES.md`: paper citation and instructions for retrieving excluded source materials.
+- Figure 2A--K output family with Figure 1A.
+- Figure 2D repeated with Figure 1B and Figure 1C as the agreed architecture benchmark.
+- Figures 3--5: PCA, feedback-mixture, and recurrent-gain analyses.
+- Figures 6--8: delayed/separate/internal feedback, control-selected outputs, four-bit memory, and motion capture.
+- Supplementary Figures S1--S2: non-RLS scalar learning rate and effective eigenvalue spectra.
 
-## Commands
+Exact targets are distinguished from structural reconstructions when the paper does not publish numerical coefficients or waveforms. Scaled failures are retained in the repository and discussed in the report.
 
-Run from the project root:
+## Layout
 
-```matlab
+- `code/`: reusable MATLAB model and analysis functions.
+- `scripts/`: one runnable script per paper case group.
+- `tests/`: MATLAB unit and smoke integration tests.
+- `results/data/`: deterministic MAT files and CSV summaries.
+- `results/figures/`: PNG and vector PDF results.
+- `data/raw/mocap/`: the two CMU AMC trials named in the paper plus provenance notes.
+- `docs/workflow.md`: Chinese teaching-style mathematical and experimental runbook.
+- `report/`: LaTeX source and compiled report.
+
+## Run
+
+From the repository root:
+
+```powershell
 matlab -batch "run('tests/run_all_tests.m')"
-matlab -batch "run('scripts/run_smoke.m')"
-matlab -batch "run('scripts/run_sweep.m')"
-matlab -batch "run('scripts/run_internal_all2all.m')"
+matlab -batch "run('scripts/run_figure2_suite.m')"
+matlab -batch "run('scripts/run_figures3_to5.m')"
+matlab -batch "run('scripts/run_figures6_to8.m')"
+matlab -batch "run('scripts/run_supplement.m')"
+```
+
+The reference-scale Figure 2D run remains available separately:
+
+```powershell
 matlab -batch "run('scripts/run_reproduction.m')"
 ```
 
-The full reproduction uses `N=1000` and `nsecs=1440`, matching the scale of the supplemental MATLAB script. Start with tests and smoke runs before launching the full run.
+Compile the report with the installed TeX Live:
 
-## Reproduction target
+```powershell
+cd report
+latexmk -pdf -interaction=nonstopmode -halt-on-error main.tex
+```
 
-The main target is the Figure 2D periodic output, a sum of four sinusoids. The MATLAB expression is adapted from the supplemental script `force_external_feedback_loop.m`.
+## Main Results
 
-The external feedback model trains only the readout vector `w` with recursive least squares. The recurrent matrix and feedback weights remain fixed. This corresponds to the Figure 1A architecture in the paper.
+- Figure 2D, architecture 1A: testing MAE `0.04033`, correlation `0.99636`.
+- Figure 2D, architecture 1C: testing MAE `0.07289`, correlation `0.92645`.
+- Figure 6C internal learning: testing MAE `0.00550`.
+- Figure 7D four-bit memory: accuracy `98.74%`.
+- Figure 8 motion capture: running/walking correlations `0.92024` / `0.96760`.
+- Supplement S2: the low-gain network has the larger spectral outlier shift.
 
-The completed full reproduction generated:
+See `results/data/*.csv` and the report for every success, partial result, and scaled failure.
 
-- `results/data/figure2d_external.mat`
-- `results/figures/figure2d_external_traces.png`
-- `report/figures/force-traces.pdf` for direct LaTeX/Overleaf inclusion
-- Training MAE: `0.005416`
-- Testing MAE: `0.036433`
-- Testing correlation: `0.997139`
+## Versioned Milestones
 
-The parameter sweep table is saved at `results/data/sweep_summary.csv`.
+| Commit | Summary |
+|---|---|
+| `d3be30d` | Reusable external FORCE runner and generalized feedback modes |
+| `39155a0` | Figure 2 cases and Figure 2D architecture benchmark |
+| `b0c9f56` | Figures 3--5 analyses |
+| `7895f5c` | Figures 6--8 controlled-network and motion cases |
+| `d4c2527` | Supplementary Figures S1--S2 |
 
-## Notes
+## Sources
 
-MATLAB R2025a is available on this machine. In the Codex sandbox, `matlab -batch` may require running outside the sandbox because MATLAB needs access to its normal startup/configuration files.
-
-The LaTeX report source is in `report/`. This environment does not currently have TeX Live or a complete Tectonic cache, so local PDF compilation failed at the TeX runtime level. The source is structured for Overleaf upload and includes the generated Figure 2D plot when `results/figures/figure2d_external_traces.pdf` is available.
-
-## Source materials
-
-The paper PDF, publisher supplemental files, and course template are excluded from Git history. See `SOURCES.md` for the paper citation and retrieval guidance.
+The article, publisher supplement, and original example scripts are described in `SOURCES.md`. Bibliographic metadata for the paper was exported from Zotero item `D2YQS7LK` to `report/bibliography/zotero.bib`. CMU motion-capture source and use terms are recorded in `data/raw/mocap/README.md`.

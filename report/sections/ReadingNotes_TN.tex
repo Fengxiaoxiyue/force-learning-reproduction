@@ -1,10 +1,30 @@
-\section*{Reading Notes}
+\section{Reproducibility Map}
 
-The detailed step-by-step workflow is maintained in \texttt{../docs/workflow.md}. The most important reading anchors are:
+\begin{tabularx}{\linewidth}{@{}l X@{}}
+\toprule
+Artifact & Purpose \\
+\midrule
+\texttt{scripts/run\_figure2\_suite.m} & Figure 2 cases and Figure 2D architecture benchmark \\
+\texttt{scripts/run\_figures3\_to5.m} & PCA, feedback interpolation, and gain sweep \\
+\texttt{scripts/run\_figures6\_to8.m} & feedback/internal tasks, memory, and motion capture \\
+\texttt{scripts/run\_supplement.m} & Supplementary Figures S1 and S2 \\
+\texttt{tests/run\_all\_tests.m} & unit and smoke integration tests \\
+\texttt{results/data/*.csv} & compact metrics used in this report \\
+\texttt{results/data/*.mat} & configurations, traces, weights, and intermediate results \\
+\texttt{docs/workflow.md} & Chinese teaching-style derivation and runbook \\
+\bottomrule
+\end{tabularx}
 
-\begin{itemize}
-    \item Main paper page 3: Figure 2 and the Figure 2D four-sinusoid target.
-    \item Main paper pages 4--6: model output \(z=w^Tr\), external feedback, and RLS/FORCE learning.
-    \item Main paper page 10: internal learning in the generator network, corresponding to the Figure 1C extension.
-    \item Supplemental Matlab scripts: \texttt{force\_external\_feedback\_loop.m}, \texttt{force\_internal\_all2all.m}, and \texttt{force\_internal\_sparse.m}.
-\end{itemize}
+\subsection{Recommended execution order}
+Run the tests first, then execute each case group independently:
+\begin{verbatim}
+matlab -batch "run('tests/run_all_tests.m')"
+matlab -batch "run('scripts/run_figure2_suite.m')"
+matlab -batch "run('scripts/run_figures3_to5.m')"
+matlab -batch "run('scripts/run_figures6_to8.m')"
+matlab -batch "run('scripts/run_supplement.m')"
+\end{verbatim}
+The full groups overwrite their own deterministic outputs. Compile this report from \texttt{report/} with \texttt{latexmk -pdf main.tex}. The generated report includes figures directly from \texttt{results/figures}, so no manual copying is required.
+
+\subsection{Versioned milestones}
+The implementation was committed one case group at a time: reusable external FORCE core (\texttt{d3be30d}), Figure 2 suite (\texttt{39155a0}), Figures 3--5 (\texttt{b0c9f56}), Figures 6--8 (\texttt{7895f5c}), and Supplementary Figures S1--S2 (\texttt{d4c2527}). These hashes identify the code and generated evidence used by the report.

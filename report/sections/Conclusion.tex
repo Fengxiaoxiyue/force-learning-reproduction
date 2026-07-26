@@ -1,7 +1,17 @@
-\section*{Conclusion}
+\section{Conclusion and Improvements}
 
-This project implements a reproducible MATLAB workflow for the Figure 2D FORCE learning result. The central mechanism is the RLS update that keeps the network output close to the target during training while finding a fixed readout vector that supports autonomous generation afterward.
+This reproduction supports the central claim that RLS can rapidly turn chaotic recurrent activity into coherent closed-loop output. The strongest evidence is the exact Figure 2D Figure 1A run (test correlation 0.996), the Figure 1C internal-learning run, the gain-dependent reduction in error and weight norm, the 98.74\% four-bit memory accuracy, and the motion-channel correlations above 0.92. The effective-spectrum analysis also recovers the paper's qualitative distinction between low and high recurrent gain.
 
-The implementation is intentionally modular: the target function, RLS rule, simulation loop, metrics, plotting, tests, and scripts are separated. This makes the reproduction easier to inspect than the original single-file examples while preserving the same mathematical structure.
+The project also identifies a clear computational boundary. Cases that were published with very large generator or feedback networks do not necessarily survive reductions to a few hundred units. Figure 1B four-sine learning, delayed nonlinear feedback, the five-function internal task, the slow sine, and non-RLS autonomous output remain incomplete at the tested scales. These failures are useful results because they separate an algorithmic implementation from a claim of numerical replication.
 
-Future extensions include running the full Figure 1C internal-learning reproduction, adding the sparse internal-learning case, and reproducing additional targets such as the noisy four-sinusoid example, square wave, or Lorenz-like trajectory.
+The next improvements should be made in this order:
+\begin{enumerate}
+    \item Run Figure 6B, Figure 7B, Figure 8, and S1 at the paper's network sizes on a machine with sufficient RAM, recording wall time and peak memory.
+    \item Replace reconstructed Figure 2E/2J waveforms if original numerical target files become available; retain checksums with the data.
+    \item Evaluate Lorenz output with short-horizon error, attractor occupancy, power spectra, and Lyapunov-sensitive statistics instead of only long pointwise MAE.
+    \item Add parameter recovery sweeps around $\alpha$, training duration, and feedback sparsity for failed cases, with paired seeds and confidence intervals.
+    \item Render the 95-channel Figure 8 result through the CMU skeleton hierarchy so motion quality can be judged geometrically, not only channel-wise.
+    \item Store environment metadata (MATLAB release, BLAS, CPU, RAM, TeX Live version) automatically with each full run.
+\end{enumerate}
+
+The repository therefore distinguishes three outcomes: exact quantitative success, qualitative or partial reconstruction, and scaled failure. That distinction is necessary for an auditable paper reproduction and is more informative than presenting only the best-looking traces.

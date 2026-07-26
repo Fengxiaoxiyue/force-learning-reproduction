@@ -1,7 +1,9 @@
-\section*{Background and Introduction}
+\section{Background and Scope}
 
 Recurrent neural networks can produce rich spontaneous dynamics because activity is continuously fed back through recurrent synapses. When the recurrent gain is large, random rate networks can become chaotic \cite{sompolinsky_chaos_1988}. This creates a useful reservoir of temporal activity, but it also makes direct control difficult.
 
 Sussillo and Abbott \cite{sussillo_generating_2009} proposed FORCE learning as a way to turn chaotic spontaneous activity into coherent target patterns. The algorithm rapidly suppresses output error during learning and then leaves a stable set of weights that can autonomously regenerate the desired signal. The paper demonstrates many outputs, including periodic signals, noisy targets, discontinuous functions, Lorenz-like trajectories, and movement patterns.
 
-This reproduction focuses on the most direct starting point: Figure 2D, a periodic function composed of four sinusoids, trained in the Figure 1A external-feedback architecture. This choice is appropriate for a first reproduction because the paper's supplemental Matlab code contains a compact reference implementation, and the target is simple enough to inspect while still exercising the core FORCE/RLS mechanism.
+The paper defines three architectures. Figure 1A learns a linear readout and feeds its output directly back to the generator. Figure 1B inserts a separate feedback network. Figure 1C modifies recurrent generator weights internally. This project uses the architecture attached to each displayed case in the paper. Only Figure 2D is deliberately repeated across all three architectures, as an architecture benchmark agreed before implementation.
+
+The scope includes main-text Figures 2--8 and Supplementary Figures S1--S2. Panels that define an input protocol rather than a separate output task (Figure 7A and 7C) are reproduced as part of the corresponding Figure 7B and 7D simulations. A result is called \emph{exact-target} only when the paper or supplemental code publishes the numerical target. Unpublished waveforms, coefficients, and implementation details are labelled structural reconstructions. Long-horizon phase error is not treated as equivalent to failure for a chaotic target, but it is still reported numerically.

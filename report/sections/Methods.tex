@@ -1,59 +1,55 @@
-\section*{Methods}
+\section{Methods}
 
-\subsection*{The model}
-The primary experiment uses the external feedback architecture shown in Figure 1A of Sussillo and Abbott \cite{sussillo_generating_2009}. The model consists of a recurrent generator network, a linear readout unit, and a feedback pathway from the readout output back to the recurrent network. The recurrent network contains \(N\) rate units. The internal state is denoted by \(x(t)\), and the firing-rate vector is
+\subsection{Rate-network dynamics and architectures}
+For the generator state $x\in\mathbf{R}^{N}$ and rates $r=\tanh(x)$, the Figure 1A implementation uses
 \[
-r(t)=\tanh(x(t)).
+x(t+\Delta t)=(1-\Delta t)x(t)+\Delta t\,M r(t)+\Delta t\,w_f z(t),
+\qquad z(t)=w^\top r(t).
 \]
+The sparse random recurrent matrix has connection probability $p$ and nonzero scale $g/\sqrt{pN}$. In Figure 1A only $w$ is learned. Figure 1B adds a feedback state $y$, rates $s=\tanh(y)$, generator-to-feedback weights $J^{FG}$, and feedback-to-generator weights $J^{GF}$. Figure 1C applies the readout-weight update to selected rows of $M$, so the desired pattern becomes internal network dynamics. The implementations are in \texttt{run\_force\_external.m}, \texttt{run\_force\_feedback\_network.m}, and \texttt{run\_force\_internal\_all2all.m}.
 
-The recurrent connectivity matrix \(M\) is randomly generated with connection probability \(p\) and scaling \(g/\sqrt{pN}\). The network output is a linear readout of the firing rates:
+\subsection{FORCE/RLS update}
+At a learning step the pre-update error is $e^-=w^\top r-f$. With $P(0)=I/\alpha$, the shared RLS update is
 \[
-z(t)=w^T r(t),
+k=Pr,\qquad c=(1+r^\top k)^{-1},\qquad
+P\leftarrow P-kk^\top c,\qquad
+w\leftarrow w-e^-kc.
 \]
-where \(w\) is the readout weight vector. During the Figure 1A experiment, only \(w\) is modified; the recurrent matrix \(M\) and the feedback weights \(w_f\) remain fixed.
+The update is isolated in \texttt{rls\_update.m}. Training leaves feedback loops closed and unclamped. Testing continues from the terminal training state with all weights fixed. We report mean absolute error (MAE), root-mean-square error where relevant, correlation, final readout norm, and task-specific accuracy.
 
-The discrete-time dynamics used in the Matlab implementation are
+\subsection{Targets and case assignment}
+The exact Figure 2D target follows the publisher-supplied MATLAB example:
 \[
-x(t+\Delta t)
-=
-(1-\Delta t)x(t)
-+
-\Delta t M r(t)
-+
-\Delta t w_f z(t).
+f(t)=\frac{a}{1.5}\left[
+\sin(\pi qt)+\frac{1}{2}\sin(2\pi qt)
++\frac{1}{6}\sin(3\pi qt)+\frac{1}{3}\sin(4\pi qt)\right],
 \]
-The output \(z(t)\) is fed back to the network, allowing the trained readout to influence future network state. This closed-loop structure enables autonomous generation after training.
+with $a=1.3$ and $q=1/60$. Figure 2H integrates the Lorenz system with $(\sigma,\beta,\rho)=(10,8/3,28)$. The triangle sequence, four-sine target, noisy-target protocol, Lorenz parameters, and fast/slow sine periods are numerical reconstructions from the paper or supplement. Figure 2E, 2G, and 2J use deterministic structural waveforms because complete numerical specifications were not published.
 
-\subsection*{Target function}
-The target is the Figure 2D signal from the paper and supplemental code:
-\[
-f(t)=\frac{1}{1.5}\left[
-a\sin(\pi q t)+\frac{a}{2}\sin(2\pi q t)
-+\frac{a}{6}\sin(3\pi q t)+\frac{a}{3}\sin(4\pi q t)
-\right],
-\]
-with \(a=1.3\) and \(q=1/60\) for the external-feedback experiment.
+\begin{table}[!htbp]
+\centering
+\small
+\caption{Architecture assignment for the displayed cases. Page references are to the supplied main-paper PDF.}
+\begin{tabularx}{\linewidth}{@{}l l X@{}}
+\toprule
+Case & Architecture & Implemented purpose \\
+\midrule
+Figure 2A--K & 1A & Output repertoire; 2D also repeated with 1B and 1C \\
+Figure 3 & 1A & PCA of rates and readout-weight trajectory \\
+Figure 4 & 1A & FORCE/output feedback versus target-clamped feedback \\
+Figure 5 & 1A & Recurrent-gain sweep \\
+Figure 6A & 1A & Delayed nonlinear output feedback \\
+Figure 6B & 1B & Separate feedback network \\
+Figure 6C & 1C & Internal recurrent learning \\
+Figure 7B, 7D & 1C & Control-selected patterns and four-bit memory \\
+Figure 8 & 1B & Running/walking motion channels \\
+Supplement S1, S2 & 1A & Scalar-rate delta rule and effective spectra \\
+\bottomrule
+\end{tabularx}
+\end{table}
 
-\subsection*{FORCE/RLS training}
-At each learning step, the instantaneous error is
-\[
-e(t)=z(t)-f(t).
-\]
-The readout vector is updated with recursive least squares:
-\[
-k=P r,\quad c=\frac{1}{1+r^T k},\quad
-P \leftarrow P-k k^T c,\quad
-w \leftarrow w-e k c.
-\]
-The matrix \(P\) is initialized as \(I/\alpha\). In the code this update is isolated in \texttt{code/rls\_update.m}; the full Figure 1A simulation is implemented in \texttt{code/run\_force\_external.m}.
+\subsection{Scaled experiments and data provenance}
+The exact reference-scale Figure 2D run uses $N=1000$, $p=0.1$, $g=1.5$, $\alpha=1$, $\Delta t=0.1$, and 1440 simulated time units. Expensive multi-trial or multi-network cases use $N=300$--500, except Figure 6C ($N=750$). These substitutions are recorded in each MAT-file configuration and are central to interpreting failures. Figure 8 uses CMU Graphics Lab trials \texttt{09\_02.amc} (running) and \texttt{08\_01.amc} (walking): root translation is removed, angles are unwrapped, smoothed with a five-frame moving average, interpolated tenfold, demeaned, and reduced/padded to 95 channels. The source permits research and commercial use but requests acknowledgment and prohibits direct resale \cite{cmu_mocap}.
 
-Training and testing are separated. During training, \(w\) is updated every \texttt{learn\_every} time steps. During testing, learning is stopped and the network continues from the final training state. The output is then compared with the target over the next time interval.
-
-\subsection*{Algorithm summary}
-\begin{enumerate}
-    \item Initialize random network \(M\), feedback \(w_f\), readout \(w=0\), and \(P=I/\alpha\).
-    \item For each training time step, update \(x\), \(r=\tanh(x)\), and \(z=w^Tr\).
-    \item At each learning step, compute \(e=z-f(t)\), then update \(w\) and \(P\) with RLS.
-    \item Store the training output \(z(t)\) and the readout norm \(\|w\|_2\).
-    \item Stop learning and continue the network forward to record autonomous testing output.
-\end{enumerate}
+\subsection{Reproducibility controls}
+Every stochastic run fixes a MATLAB Twister seed. Unit tests cover target dimensions, RLS dimensions and symmetry, fixed-seed repeatability, stored-rate dimensions, AMC parsing, and finite non-RLS learning rates. Generated results are saved under \texttt{results/data}; publication-ready PNG and vector PDF figures are saved under \texttt{results/figures}. Zotero item \texttt{D2YQS7LK} was exported to \texttt{report/bibliography/zotero.bib}; its citation key is \texttt{sussillo\_generating\_2009}.
