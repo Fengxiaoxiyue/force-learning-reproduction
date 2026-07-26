@@ -28,8 +28,16 @@ wo = zeros(N, 1);
 simtime = cfg.simtime;
 simtime2 = cfg.simtime2;
 simtime_len = cfg.num_steps;
-ft = make_four_sine_target(simtime, cfg);
-ft2 = make_four_sine_target(simtime2, cfg);
+if isfield(cfg, 'target_train') && ~isempty(cfg.target_train)
+    ft = cfg.target_train;
+else
+    ft = make_four_sine_target(simtime, cfg);
+end
+if isfield(cfg, 'target_test') && ~isempty(cfg.target_test)
+    ft2 = cfg.target_test;
+else
+    ft2 = make_four_sine_target(simtime2, cfg);
+end
 
 wo_len = zeros(1, simtime_len);
 zt = zeros(1, simtime_len);

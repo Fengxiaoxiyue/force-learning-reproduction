@@ -1,0 +1,13 @@
+case_id,architecture,exact_target,training_mae,testing_mae,testing_corr,note
+ABC,1A,1,0.00757998979311669,0.288877222476476,0.832853244868415,"Triangle-wave training sequence shown in panels A-C."
+D,1A,1,0.00282381444536544,0.0403255704188407,0.996355939990826,"Four-sinusoid expression from the supplemental Matlab code."
+E,1A,0,0.00744424940741989,0.54713677511942,0.0449142423473323,"Deterministic 16-harmonic reconstruction; original coefficients were not published."
+F,1A,1,0.414758978834661,0.419234874422672,0.611547418594437,"Clean test target; Gaussian noise is added only to the training segment."
+G,1A,0,0.0368278877266071,0.0446532983300779,0.96624121083062,"Square-wave reconstruction with the published qualitative form."
+H,1A,1,0.0276993263175309,0.88082109398407,0.0460498669398413,"Lorenz sigma=10, beta=8/3, rho=28; x component divided by 10."
+I_FAST,1A,1,0.00786939331996669,0.222075451664123,0.940611427035685,"Sine period 60 ms (6 network time constants)."
+I_SLOW,1A,1,0.00913279626627477,2.13861438465484,0.0545645345918575,"Sine period 8 s (800 network time constants)."
+K,1A,1,0.00109202637743205,0.0444249291576008,0.0265431291667678,"Low-amplitude sine deliberately below chaos-control regime."
+D,1B,1,0.0267918709387356,1.07341605739614,-0.099601839514558,"Four-sinusoid expression from the supplemental Matlab code; scaled Figure 1B did not stabilize."
+D,1C,1,0.00183601435272761,0.0728911429066687,0.926447072270379,"Four-sinusoid expression from the supplemental Matlab code."
+J,1A-two-loop,0,0.0240552650729671,0.15954878642685,0.827467077899527,"Deterministic one-shot waveform; original numerical waveform was not published."

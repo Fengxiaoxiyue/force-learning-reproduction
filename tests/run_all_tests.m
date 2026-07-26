@@ -32,4 +32,21 @@ assert(all(isfinite(r1.zt)) && all(isfinite(r1.zpt)), 'Simulation output contain
 assert(isfinite(r1.metrics.training_mae), 'Training MAE is not finite.');
 assert(isfinite(r1.metrics.testing_mae), 'Testing MAE is not finite.');
 
+[case_cfg, case_info] = make_figure2_case('H', 'standard');
+assert(numel(case_cfg.target_train) == case_cfg.num_steps, 'Figure 2 target length mismatch.');
+assert(all(isfinite(case_cfg.target_train)), 'Figure 2 target contains non-finite values.');
+assert(case_info.exact, 'Lorenz target should be marked as exact from published parameters.');
+
+one_shot_cfg = make_config('test');
+one_shot_cfg.tag = 'test_one_shot';
+one_shot = run_figure2_one_shot(one_shot_cfg);
+assert(all(isfinite(one_shot.zpt)), 'One-shot output contains non-finite values.');
+
+feedback_cfg = make_config('test');
+feedback_cfg.NF = 6;
+feedback_cfg.target_train = make_four_sine_target(feedback_cfg.simtime, feedback_cfg);
+feedback_cfg.target_test = make_four_sine_target(feedback_cfg.simtime2, feedback_cfg);
+feedback_result = run_force_feedback_network(feedback_cfg);
+assert(all(isfinite(feedback_result.zpt)), 'Feedback-network output contains non-finite values.');
+
 fprintf('All tests passed.\n');
