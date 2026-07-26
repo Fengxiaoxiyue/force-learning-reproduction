@@ -139,3 +139,20 @@ timing, with capacity and repeated trials providing the final improvement.
 Because the paper did not publish the numerical aperiodic waveform, this
 validates the two-loop one-shot mechanism but not pointwise replication of the
 paper's particular target.
+
+### Figure 2H: Lorenz chaotic output
+
+| N | Pointwise corr. | First-100 corr. | Quantile MAE / target SD | SD ratio | Log-PSD corr. | ACF MAE |
+|---:|---:|---:|---:|---:|---:|---:|
+| 1000 | 0.046 | 0.887 | 0.098 | 0.983 | 0.973 | 0.0570 |
+| 1500 | -0.014 | 0.201 | 0.085 | 0.981 | 0.968 | 0.0302 |
+
+**Outcome: statistically recovered.** Both autonomous outputs lose pointwise
+alignment over the full test, as expected after small state errors grow on a
+chaotic attractor. The `N=1000` run retains strong short-horizon agreement and
+matches the target distribution and spectrum. `N=1500` halves training error
+and improves the marginal distribution and autocorrelation, but diverges in
+phase earlier. This non-monotonic short-horizon behavior is expected for a
+single deterministic seed near a chaotic trajectory and is not evidence that
+the larger network lost the attractor. Long-horizon pointwise MAE remains in
+the artifact for transparency but is not the reproduction success criterion.

@@ -37,6 +37,14 @@ assert(numel(case_cfg.target_train) == case_cfg.num_steps, 'Figure 2 target leng
 assert(all(isfinite(case_cfg.target_train)), 'Figure 2 target contains non-finite values.');
 assert(case_info.exact, 'Lorenz target should be marked as exact from published parameters.');
 
+chaos_fixture = struct('ft2', sin(0:0.01:20), 'zpt', sin(0:0.01:20));
+chaos_metrics = compute_chaos_metrics(chaos_fixture);
+assert(chaos_metrics.pointwise_mae < eps, 'Identical chaos signals have nonzero MAE.');
+assert(abs(chaos_metrics.log_psd_corr - 1) < 1e-12, ...
+    'Identical chaos signals should have equal spectra.');
+assert(chaos_metrics.autocorrelation_mae < eps, ...
+    'Identical chaos signals should have equal autocorrelation.');
+
 one_shot_cfg = make_config('test');
 one_shot_cfg.tag = 'test_one_shot';
 one_shot = run_figure2_one_shot(one_shot_cfg);
