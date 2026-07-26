@@ -121,3 +121,21 @@ times too fast. The non-monotonic frequency changes with `N` indicate a
 closed-loop bifurcation/stability problem. More samples alone are unlikely to
 fix it; recovery would require a targeted search over gain, feedback scale,
 seed, or an explicit slow-state regularizer.
+
+### Figure 2J: one-shot learning with two feedback loops
+
+| N | Training trials | Train MAE | Test MAE | Test corr. | Runtime |
+|---:|---:|---:|---:|---:|---:|
+| 300 | 12 | 0.01239 | 0.06165 | 0.97768 | 2.8 s |
+| 500 | 24 | 0.00076 | 0.00089 | 0.999996 | 22.0 s |
+
+**Outcome: structural case recovered.** The original implementation paired a
+readout error computed from the old recurrent state with an RLS regressor from
+the newly integrated state. Correcting that one-step mismatch improved the
+original-size test correlation from 0.827 to 0.978. Increasing to `N=500` and
+24 repeated initialization/sequence trials then produced a stable autonomous
+trace with effectively exact agreement. The main failure was implementation
+timing, with capacity and repeated trials providing the final improvement.
+Because the paper did not publish the numerical aperiodic waveform, this
+validates the two-loop one-shot mechanism but not pointwise replication of the
+paper's particular target.

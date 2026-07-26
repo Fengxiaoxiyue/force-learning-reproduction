@@ -41,6 +41,10 @@ one_shot_cfg = make_config('test');
 one_shot_cfg.tag = 'test_one_shot';
 one_shot = run_figure2_one_shot(one_shot_cfg);
 assert(all(isfinite(one_shot.zpt)), 'One-shot output contains non-finite values.');
+assert(numel(one_shot.trial_mae) == one_shot.cfg.training_trials, ...
+    'One-shot trial history length mismatch.');
+assert(all(isfinite(one_shot.trial_mae)), ...
+    'One-shot trial history contains non-finite values.');
 
 feedback_cfg = make_config('test');
 feedback_cfg.NF = 6;
