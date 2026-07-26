@@ -32,3 +32,17 @@ failed in the first scaled reproduction. Raw attempts are stored under
 
 Entries are appended case by case with configuration, cost, outcome, and the
 most likely reason for success or failure.
+
+### Figure 2A-C: triangle sequence
+
+| N | Train MAE | Test MAE | Test corr. | Phase-aligned MAE | Runtime |
+|---:|---:|---:|---:|---:|---:|
+| 1000 | 0.00758 | 0.28888 | 0.83285 | 0.03563 | 20.9 s |
+| 1500 | 0.00336 | 0.00260 | 0.99998 | 0.00154 | 52.2 s |
+
+**Outcome: recovered.** At `N=1000`, the amplitude ratio (0.996) and dominant
+frequency ratio (1.000) show that the correct autonomous orbit was learned,
+but its absolute phase drifted. Increasing the network to `N=1500` removed
+the phase error without changing the seed, gain, regularization, target, or
+training duration. The failure was therefore capacity/closed-loop phase
+stability, not an incorrect target or RLS implementation.
